@@ -7,7 +7,7 @@ Click This Link To Check Out My Page: https://johnedwards700.github.io/John-Port
 ## Table of Contents
 [License](#license) 
 
-[skills](#Skills)
+[skills](#-Skills)
 
 ## License
 This Project is licensed under the [MIT License](LICENSE).
