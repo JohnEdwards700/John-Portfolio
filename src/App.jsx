@@ -119,7 +119,7 @@ const projectData =[
           <br/>
           <p className="text-gray-400">But leveraging that curiosity I have learned foundations of coding starting with functional programming, moving into object oriented programming, and recently machine learning. Increasing effeciency of code learning algorithms and how the system operates. Persuing challenges such as coding competetions and collaborating on projects. </p>
           <br/>
-          <p className="text-gray-400">When im not learning about coding I become a Polymatch, learning and developing other physical and mental skills. I also enjoy trying new cuisines with my girlfriend and friends as well.</p>
+          <p className="text-gray-400">When im not learning about coding I become a Polymath, learning and developing other physical and mental skills. I also enjoy trying new cuisines with my girlfriend and friends as well.</p>
           </div>
         </section>
         
