@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import { profile } from '../data/profile';
+
+const { title = 'John Edwards | Software Engineer', description = 'Software engineering projects and experience by John Edwards.', showChrome = true } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f1e8" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta name="base-url" content={base} />
+    <title>{title}</title>
+  </head>
+  <body>
+    {showChrome && <a class="skip-link" href="#main">Skip to content</a>}
+    {showChrome && <header class="site-header compact-header">
+      <div class="header-inner">
+        <a class="wordmark" href={base} aria-label="John Edwards home">JE<span> / field notes</span></a>
+        <nav aria-label="Main navigation">
+          <a href={`${base}projects/`}>Projects</a>
+          <a href={`${base}experience/`}>Experience</a>
+          <a href={`${base}#about`}>About</a>
+          <a href={`mailto:${profile.email}`}>Contact</a>
+        </nav>
+        <a class="resume-link" href={`${base}resume.pdf`} target="_blank" rel="noreferrer">Resume <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>}
+    <slot />
+    {showChrome && <footer class="site-footer compact-footer">
+      <div class="page-wrap compact-footer-inner">
+        <a class="wordmark" href={base}>John Edwards <span>· Software Engineer</span></a>
+        <nav aria-label="Footer navigation">
+          <a href={`${base}projects/`}>Projects</a>
+          <a href={`${base}experience/`}>Experience</a>
+          <a href={`mailto:${profile.email}`}>Email</a>
+          <a href={`${base}resume.pdf`} target="_blank" rel="noreferrer">Resume ↗</a>
+        </nav>
+      </div>
+    </footer>}
+    <script is:inline>
+      const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '/';
+      const legacy = window.location.hash.match(/^#\/(projects|experience)\/([^/?#]+)\/?$/);
+      if (legacy) window.location.replace(`${baseUrl}${legacy[1]}/${encodeURIComponent(decodeURIComponent(legacy[2]))}/`);
+    </script>
+  </body>
+</html>

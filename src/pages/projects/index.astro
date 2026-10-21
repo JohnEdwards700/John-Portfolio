@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) =>
+  (a.data.featuredOrder ?? Number.MAX_SAFE_INTEGER) - (b.data.featuredOrder ?? Number.MAX_SAFE_INTEGER),
+);
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="Projects | John Edwards" description="Selected software engineering and research projects by John Edwards.">
+  <main id="main" class="notebook">
+    <header class="page-heading">
+      <p class="eyebrow">Selected work / project index</p>
+      <h1>Projects</h1>
+      <p class="intro">A working record of software, research, and the decisions behind each project.</p>
+    </header>
+
+    <ol class="entries">
+      {projects.map(({ id, data }, index) => (
+        <li class="entry">
+          <span class="number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+          <div class="entry-main">
+            <p class="eyebrow">{data.timeframe}{data.status ? ` · ${data.status}` : ''}</p>
+            <h2><a href={`${base}projects/${id}/`}>{data.title}</a></h2>
+            <p>{data.summary}</p>
+            <dl class="metadata">
+              {data.role && <div><dt>Role</dt><dd>{data.role}</dd></div>}
+              {data.technologies?.length > 0 && <div><dt>Tools</dt><dd>{data.technologies.join(' · ')}</dd></div>}
+            </dl>
+          </div>
+          <div class="actions">
+            <a class="case-link" href={`${base}projects/${id}/`}>Read case study <span aria-hidden="true">→</span></a>
+            {data.demoUrl && <a href={data.demoUrl} target="_blank" rel="noreferrer">Live demo ↗</a>}
+            {data.sourceUrl && <a href={data.sourceUrl} target="_blank" rel="noreferrer">Source ↗</a>}
+            {data.artifactUrl && <a href={data.artifactUrl} target="_blank" rel="noreferrer">{data.artifactLabel ?? 'View project artifact'} ↗</a>}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </main>
+</BaseLayout>
+
+<style>
+  .notebook { max-width: 920px; margin: 0 auto; padding: clamp(3rem, 8vw, 6.5rem) 1.25rem; color: var(--ink, #24211d); }
+  .page-heading { max-width: 680px; margin-bottom: 3.5rem; }
+  .eyebrow, dt { font: 600 .75rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #746d64); }
+  h1, h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; }
+  h1 { font-size: clamp(3rem, 8vw, 5.5rem); letter-spacing: -.045em; line-height: 1; margin: .5rem 0 1rem; }
+  .intro { font-size: 1.2rem; line-height: 1.6; color: var(--muted, #625b53); }
+  .entries { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line, #d8d0c5); }
+  .entry { display: grid; grid-template-columns: 3rem minmax(0, 1fr) 9rem; gap: 1rem; padding: 2rem 0; border-bottom: 1px solid var(--line, #d8d0c5); }
+  .number { font: 1rem ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--accent, #9a4c32); padding-top: .3rem; }
+  .entry .eyebrow { margin: 0 0 .55rem; }
+  h2 { font-size: clamp(1.55rem, 3vw, 2rem); margin: 0 0 .65rem; }
+  h2 a { color: inherit; text-decoration-thickness: .07em; text-underline-offset: .16em; }
+  .entry-main > p:not(.eyebrow) { line-height: 1.65; max-width: 65ch; margin: 0; }
+  .metadata { display: grid; gap: .5rem; margin: 1rem 0 0; }
+  .metadata div { display: grid; grid-template-columns: 4rem 1fr; gap: .5rem; }
+  dt { font-size: .68rem; }
+  dd { margin: 0; font-size: .9rem; color: var(--muted, #625b53); }
+  .actions { display: flex; flex-direction: column; align-items: flex-start; gap: .65rem; padding-top: 1.7rem; font-size: .9rem; }
+  .actions a { color: var(--accent, #8a412a); text-underline-offset: .2em; }
+  .actions .case-link { font-weight: 650; }
+  a:focus-visible { outline: 3px solid var(--accent, #9a4c32); outline-offset: 4px; border-radius: 2px; }
+  @media (max-width: 640px) { .entry { grid-template-columns: 2rem 1fr; gap: .5rem 1rem; } .actions { grid-column: 2; flex-direction: row; flex-wrap: wrap; padding-top: .5rem; } }
+</style>
