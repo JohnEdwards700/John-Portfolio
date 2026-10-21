@@ -1,0 +1,76 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectSketch from '../../components/ProjectSketch.astro';
+
+export async function getStaticPaths() {
+  return (await getCollection('projects')).map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, summary, subtitle, timeframe, role, status, technologies = [], demoUrl, sourceUrl, artifactUrl, artifactLabel, image, imageAlt, keyContributions = [] } = entry.data;
+const base = import.meta.env.BASE_URL;
+const imageSrc = image?.startsWith('http') ? image : image ? `${base}${image.replace(/^\/+/, '')}` : undefined;
+---
+
+<BaseLayout title={`${title} | John Edwards`} description={summary}>
+  <main id="main" class="case-study">
+    <a class="back" href={`${base}projects/`}>← All projects</a>
+    <header>
+      <p class="eyebrow">Case study / {timeframe}{status ? ` · ${status}` : ''}</p>
+      <h1>{title}</h1>
+      {subtitle && <p class="subtitle">{subtitle}</p>}
+      <p class="summary">{summary}</p>
+      <dl class="facts">
+        {role && <div><dt>Role</dt><dd>{role}</dd></div>}
+        {timeframe && <div><dt>When</dt><dd>{timeframe}</dd></div>}
+        {status && <div><dt>Status</dt><dd>{status}</dd></div>}
+      </dl>
+      <ul class="tools" aria-label="Technologies">{technologies.map((technology) => <li>{technology}</li>)}</ul>
+      <nav class="links" aria-label="Project links">
+        {demoUrl ? <a href={demoUrl} target="_blank" rel="noreferrer">Open live demo ↗</a> : <span>Live demo unavailable</span>}
+        {sourceUrl ? <a href={sourceUrl} target="_blank" rel="noreferrer">View source ↗</a> : <span>Public source unavailable</span>}
+        {artifactUrl && <a href={artifactUrl} target="_blank" rel="noreferrer">{artifactLabel ?? 'View project artifact'} ↗</a>}
+      </nav>
+    </header>
+
+    {imageSrc && <figure class="artifact"><img src={imageSrc} alt={imageAlt ?? ''} />{imageAlt && <figcaption>{imageAlt}</figcaption>}</figure>}
+    <ProjectSketch slug={entry.id} />
+
+    <div class="story-grid">
+      <aside class="margin-note">
+        <p class="eyebrow">Contribution</p>
+        {keyContributions.length ? <ul>{keyContributions.map((item) => <li>{item}</li>)}</ul> : <p>See the project notes for the work and decisions documented here.</p>}
+      </aside>
+      <article class="prose">
+        <h2>Project notes</h2>
+        <Content />
+      </article>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .case-study { max-width: 1000px; margin: auto; padding: clamp(2.5rem, 7vw, 6rem) 1.25rem; color: var(--ink, #24211d); }
+  .back, .links a { color: var(--accent, #8a412a); text-underline-offset: .2em; }
+  header { max-width: 760px; margin: 2.5rem 0 3rem; }
+  .eyebrow, dt { font: 600 .75rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .07em; text-transform: uppercase; color: var(--muted, #746d64); }
+  h1, h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; }
+  h1 { font-size: clamp(2.8rem, 7vw, 5.2rem); line-height: 1.02; letter-spacing: -.045em; margin: .55rem 0; }
+  .subtitle { color: var(--muted, #625b53); margin: .5rem 0; }
+  .summary { max-width: 65ch; font-size: 1.25rem; line-height: 1.6; }
+  .facts { display: flex; gap: 2rem; flex-wrap: wrap; margin: 1.5rem 0; }
+  .facts div { min-width: 6rem; } dd { margin: .2rem 0 0; }
+  .tools { display: flex; flex-wrap: wrap; list-style: none; padding: 0; gap: .45rem; }
+  .tools li { border: 1px solid var(--line, #d8d0c5); padding: .3rem .55rem; border-radius: 2px; font: .8rem ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .links { display: flex; flex-wrap: wrap; gap: 1.2rem; margin-top: 1.4rem; }
+  .links span { color: var(--muted, #746d64); font-size: .9rem; }
+  .artifact { margin: 2rem 0 3rem; } .artifact img { width: 100%; height: auto; display: block; } .artifact figcaption { color: var(--muted, #746d64); font-size: .85rem; margin-top: .5rem; }
+  .story-grid { display: grid; grid-template-columns: minmax(12rem, .7fr) minmax(0, 1.6fr); gap: clamp(2rem, 8vw, 6rem); border-top: 1px solid var(--line, #d8d0c5); padding-top: 2rem; }
+  .margin-note { font-size: .95rem; line-height: 1.6; color: var(--muted, #625b53); } .margin-note ul { padding-left: 1.1rem; } .margin-note li { margin: 0 0 .8rem; }
+  .prose { font-size: 1.05rem; line-height: 1.75; max-width: 68ch; } .prose :global(h2) { font-size: 1.8rem; margin: 2rem 0 .7rem; } .prose :global(h3) { font-size: 1.25rem; margin: 1.7rem 0 .4rem; } .prose :global(p), .prose :global(ul) { margin: 0 0 1rem; } .prose :global(li) { padding-left: .25rem; margin: .35rem 0; }
+  .outcome { border-left: 3px solid var(--accent, #9a4c32); padding-left: 1rem; margin-top: 2.5rem; }
+  a:focus-visible { outline: 3px solid var(--accent, #9a4c32); outline-offset: 4px; border-radius: 2px; }
+  @media (max-width: 650px) { .story-grid { grid-template-columns: 1fr; gap: 1rem; } .margin-note { border-bottom: 1px solid var(--line, #d8d0c5); padding-bottom: 1rem; } }
+</style>

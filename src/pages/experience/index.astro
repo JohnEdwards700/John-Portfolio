@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const experiences = (await getCollection('experience')).sort((a, b) =>
+  (a.data.featuredOrder ?? Number.MAX_SAFE_INTEGER) - (b.data.featuredOrder ?? Number.MAX_SAFE_INTEGER),
+);
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="Experience | John Edwards" description="Professional, leadership, and team experience from John Edwards.">
+  <main id="main" class="notebook">
+    <header class="page-heading">
+      <p class="eyebrow">Work / leadership / collaboration</p>
+      <h1>Experience</h1>
+      <p class="intro">The people, systems, and responsibilities behind the work.</p>
+    </header>
+    <ol class="entries">
+      {experiences.map(({ id, data }) => (
+        <li class="entry">
+          <div>
+            <p class="eyebrow">{data.timeframe}</p>
+            <h2><a href={`${base}experience/${id}/`}>{data.title}</a></h2>
+            <p class="organization">{data.organization}{data.location ? ` · ${data.location}` : ''}</p>
+            <p>{data.summary}</p>
+            {data.technologies?.length > 0 && <p class="tools">{data.technologies.join(' · ')}</p>}
+          </div>
+          <a class="case-link" href={`${base}experience/${id}/`}>Read story <span aria-hidden="true">→</span></a>
+        </li>
+      ))}
+    </ol>
+  </main>
+</BaseLayout>
+
+<style>
+  .notebook { max-width: 880px; margin: auto; padding: clamp(3rem, 8vw, 6.5rem) 1.25rem; color: var(--ink, #24211d); }
+  .page-heading { max-width: 680px; margin-bottom: 3.5rem; }
+  .eyebrow { font: 600 .75rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #746d64); }
+  h1, h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; }
+  h1 { font-size: clamp(3rem, 8vw, 5.5rem); letter-spacing: -.045em; line-height: 1; margin: .5rem 0 1rem; }
+  .intro { font-size: 1.2rem; line-height: 1.6; color: var(--muted, #625b53); }
+  .entries { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--line, #d8d0c5); }
+  .entry { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; padding: 2rem 0; border-bottom: 1px solid var(--line, #d8d0c5); }
+  .entry .eyebrow { margin: 0 0 .5rem; } h2 { font-size: clamp(1.55rem, 3vw, 2rem); margin: 0; } h2 a { color: inherit; text-underline-offset: .16em; }
+  .organization { color: var(--accent, #8a412a); margin: .3rem 0 .8rem; } .entry div > p:not(.eyebrow, .organization, .tools) { max-width: 68ch; line-height: 1.65; margin: 0; }
+  .tools { color: var(--muted, #746d64); font: .78rem ui-monospace, SFMono-Regular, Menlo, monospace; margin: .8rem 0 0; }
+  .case-link { color: var(--accent, #8a412a); font-weight: 650; white-space: nowrap; text-underline-offset: .2em; }
+  a:focus-visible { outline: 3px solid var(--accent, #9a4c32); outline-offset: 4px; border-radius: 2px; }
+  @media (max-width: 600px) { .entry { grid-template-columns: 1fr; gap: .8rem; } }
+</style>

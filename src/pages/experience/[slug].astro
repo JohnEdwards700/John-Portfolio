@@ -1,0 +1,47 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  return (await getCollection('experience')).map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, organization, timeframe, location, summary, technologies = [], keyContributions = [] } = entry.data;
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title={`${title} | Experience | John Edwards`} description={summary}>
+  <main id="main" class="story">
+    <a class="back" href={`${base}experience/`}>← All experience</a>
+    <header>
+      <p class="eyebrow">Experience / {timeframe}</p>
+      <h1>{title}</h1>
+      <p class="organization">{organization}{location ? ` · ${location}` : ''}</p>
+      <p class="summary">{summary}</p>
+      <ul class="tools" aria-label="Skills and tools">{technologies.map((item) => <li>{item}</li>)}</ul>
+    </header>
+    <div class="story-grid">
+      <aside>
+        <p class="eyebrow">Key contributions</p>
+        {keyContributions.length ? <ul>{keyContributions.map((item) => <li>{item}</li>)}</ul> : <p>See the story notes for responsibilities and outcomes.</p>}
+      </aside>
+      <article class="prose"><h2>Field notes</h2><Content /></article>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .story { max-width: 960px; margin: auto; padding: clamp(2.5rem, 7vw, 6rem) 1.25rem; color: var(--ink, #24211d); }
+  .back { color: var(--accent, #8a412a); text-underline-offset: .2em; }
+  header { max-width: 760px; margin: 2.5rem 0 3rem; } .eyebrow { font: 600 .75rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .07em; text-transform: uppercase; color: var(--muted, #746d64); }
+  h1, h2 { font-family: Georgia, 'Times New Roman', serif; font-weight: 500; } h1 { font-size: clamp(2.8rem, 7vw, 5.2rem); line-height: 1.02; letter-spacing: -.045em; margin: .55rem 0; }
+  .organization { color: var(--accent, #8a412a); font-size: 1.1rem; margin: .6rem 0; } .summary { max-width: 65ch; font-size: 1.25rem; line-height: 1.6; }
+  .tools { display: flex; flex-wrap: wrap; gap: .45rem; list-style: none; padding: 0; } .tools li { border: 1px solid var(--line, #d8d0c5); padding: .3rem .55rem; font: .8rem ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .story-grid { display: grid; grid-template-columns: minmax(12rem, .7fr) minmax(0, 1.6fr); gap: clamp(2rem, 8vw, 6rem); border-top: 1px solid var(--line, #d8d0c5); padding-top: 2rem; }
+  aside { color: var(--muted, #625b53); font-size: .95rem; line-height: 1.6; } aside ul { padding-left: 1.1rem; } aside li { margin: 0 0 .8rem; }
+  .prose { font-size: 1.05rem; line-height: 1.75; max-width: 68ch; } .prose :global(h2) { font-size: 1.8rem; margin: 0 0 .7rem; } .prose :global(h3) { font-size: 1.25rem; margin: 1.7rem 0 .4rem; } .prose :global(p), .prose :global(ul) { margin: 0 0 1rem; }
+  a:focus-visible { outline: 3px solid var(--accent, #9a4c32); outline-offset: 4px; border-radius: 2px; }
+  @media (max-width: 650px) { .story-grid { grid-template-columns: 1fr; gap: 1rem; } aside { border-bottom: 1px solid var(--line, #d8d0c5); padding-bottom: 1rem; } }
+</style>
